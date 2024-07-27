@@ -58,87 +58,9 @@ Expected result is something like:
 Setup project in VSCode
 =============
 
-Here are some useful vscode config files. Keep in mind to adjust the files according to your project paths.
+Check out the example folder for a ESP32 example using platformio and the arduino framework. It includes a launch.json and tasks.json file configured to build, assembly and flash the binary to the simulator as well as starting the simulator. Pressing the Start Debug Play button should do everything for you.
 
-*launch.json*
-
-.. code-block:: json
-
-  {
-      // This launch file will allow you to start the QEMU simulation using the 
-      // Debugger UI elements of VSCode. It will take care of building the 
-      // solution, packing it into a binary and starting the simulator accordingly.
-      "version": "0.2.0",
-      "configurations": [
-          {
-              "name": "QEMU build",
-              "type": "node",
-              "request": "launch",
-              "program": "${workspaceFolder}/qemu/runner.js",
-              "args": [
-                  "esp32",
-                  "firmware.bin",
-                  "${workspaceFolder}"
-              ],
-              "preLaunchTask": "QEMU build binary",
-              "console": "integratedTerminal",
-              "internalConsoleOptions": "openOnSessionStart"
-          }
-      ]
-  }
-
-*tasks.json*
-
-.. code-block:: json
-  
-  {
-      "version": "2.0.0",
-      "tasks": [
-          {
-              "label": "QEMU build binary",
-              "type": "shell",
-              "command": "esptool.py",
-              "args": [
-                  "--chip",
-                  "esp32",
-                  "merge_bin",
-                  "--flash_mode",
-                  "dio",
-                  "--flash_size",
-                  "4MB",
-                  "--fill-flash-size",
-                  "4MB",
-                  "--output",
-                  "${workspaceFolder}/qemu/bin/firmware.bin",
-                  "0x1000",
-                  "${workspaceFolder}/.pio/build/test_esp32/bootloader.bin",
-                  "0x8000",
-                  "${workspaceFolder}/.pio/build/test_esp32/partitions.bin",
-                  "0x10000",
-                  "${workspaceFolder}/.pio/build/test_esp32/firmware.bin"
-              ],
-              "group": {
-                  "kind": "build",
-                  "isDefault": false
-              },
-              "dependsOn": "PlatformIO: Build",
-              "problemMatcher": []
-          },
-          {
-              "label": "PlatformIO: Build",
-              "type": "shell",
-              "command": "pio",
-              "args": [
-                  "run"
-              ],
-              "group": {
-                  "kind": "build",
-                  "isDefault": false
-              },
-              "problemMatcher": []
-          }
-      ]
-  }
+This makes the whole code iteration process in around 10s from code change to running simulator by just clicking one button. Don't forget to checkout the runner.js in the qemu folder of the example. It interfaces the weird qemu terminal.
 
 
 Old original readme from espressif below.
