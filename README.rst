@@ -64,78 +64,81 @@ Here are some useful vscode config files. Keep in mind to adjust the files accor
 
 .. code-block:: json
 
-{
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "QEMU build",
-            "type": "node",
-            "request": "launch",
-            "program": "${workspaceFolder}/qemu/runner.js",
-            "args": [
-                "esp32",
-                "firmware.bin",
-                "${workspaceFolder}"
-            ],
-            "preLaunchTask": "QEMU build binary",
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "openOnSessionStart"
-        }
-    ]
-}
+  {
+      // This launch file will allow you to start the QEMU simulation using the 
+      // Debugger UI elements of VSCode. It will take care of building the 
+      // solution, packing it into a binary and starting the simulator accordingly.
+      "version": "0.2.0",
+      "configurations": [
+          {
+              "name": "QEMU build",
+              "type": "node",
+              "request": "launch",
+              "program": "${workspaceFolder}/qemu/runner.js",
+              "args": [
+                  "esp32",
+                  "firmware.bin",
+                  "${workspaceFolder}"
+              ],
+              "preLaunchTask": "QEMU build binary",
+              "console": "integratedTerminal",
+              "internalConsoleOptions": "openOnSessionStart"
+          }
+      ]
+  }
 
 *tasks.json*
 
 .. code-block:: json
-
-{
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "QEMU build binary",
-            "type": "shell",
-            "command": "esptool.py",
-            "args": [
-                "--chip",
-                "esp32",
-                "merge_bin",
-                "--flash_mode",
-                "dio",
-                "--flash_size",
-                "4MB",
-                "--fill-flash-size",
-                "4MB",
-                "--output",
-                "${workspaceFolder}/qemu/bin/firmware.bin",
-                "0x1000",
-                "${workspaceFolder}/.pio/build/test_esp32/bootloader.bin",
-                "0x8000",
-                "${workspaceFolder}/.pio/build/test_esp32/partitions.bin",
-                "0x10000",
-                "${workspaceFolder}/.pio/build/test_esp32/firmware.bin"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "dependsOn": "PlatformIO: Build",
-            "problemMatcher": []
-        },
-        {
-            "label": "PlatformIO: Build",
-            "type": "shell",
-            "command": "pio",
-            "args": [
-                "run"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            },
-            "problemMatcher": []
-        }
-    ]
-}
+  
+  {
+      "version": "2.0.0",
+      "tasks": [
+          {
+              "label": "QEMU build binary",
+              "type": "shell",
+              "command": "esptool.py",
+              "args": [
+                  "--chip",
+                  "esp32",
+                  "merge_bin",
+                  "--flash_mode",
+                  "dio",
+                  "--flash_size",
+                  "4MB",
+                  "--fill-flash-size",
+                  "4MB",
+                  "--output",
+                  "${workspaceFolder}/qemu/bin/firmware.bin",
+                  "0x1000",
+                  "${workspaceFolder}/.pio/build/test_esp32/bootloader.bin",
+                  "0x8000",
+                  "${workspaceFolder}/.pio/build/test_esp32/partitions.bin",
+                  "0x10000",
+                  "${workspaceFolder}/.pio/build/test_esp32/firmware.bin"
+              ],
+              "group": {
+                  "kind": "build",
+                  "isDefault": false
+              },
+              "dependsOn": "PlatformIO: Build",
+              "problemMatcher": []
+          },
+          {
+              "label": "PlatformIO: Build",
+              "type": "shell",
+              "command": "pio",
+              "args": [
+                  "run"
+              ],
+              "group": {
+                  "kind": "build",
+                  "isDefault": false
+              },
+              "problemMatcher": []
+          }
+      ]
+  }
 
 
 Old original readme from espressif below.
