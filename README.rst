@@ -62,6 +62,58 @@ Check out the example folder for a ESP32 example using platformio and the arduin
 
 This makes the whole code iteration process in around 10s from code change to running simulator by just clicking one button. Don't forget to checkout the runner.js in the qemu folder of the example. It interfaces the weird qemu terminal.
 
+*main.cpp*
+
+.. code-block:: cpp
+
+  #include <Arduino.h>
+  #include <iostream>
+  
+  void setup()
+  {
+    std::cout << millis() << ": Look mom, I can count..." << std::endl;
+  }
+  
+  int count = 0;
+  void loop()
+  {
+    long now = millis();
+    long next = now + 1000;
+    std::cout << now << ": " << ++count << std::endl;
+    while(next > millis()){
+      // do nothing
+    }
+  }
+
+*output.txt*
+
+.. code-block:: shell
+
+  QEMU for ESP32 started!
+  
+  ==67589==WARNING: ASan is ignoring requested __asan_handle_no_return: stack type: default top: 0x00016fcb0000; bottom 0x000106b84000; size: 0x00006912c000 (1762836480)
+  False positive error reports may follow
+  For details see https://github.com/google/sanitizers/issues/189
+  Adding SPI flash device
+  ets Jul 29 2019 12:21:46
+  
+  rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+  configsip: 0, SPIWP:0xee
+  clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+  mode:DIO, clock div:1
+  load:0x3fff0030,len:1184
+  load:0x40078000,len:13260
+  load:0x40080400,len:3028
+  entry 0x400805e4
+  2103: Look mom, I can count...
+  2136: 1
+  3136: 2
+  4136: 3
+  5136: 4
+  ...
+  ^C
+  QEMU stopped!
+
 
 Old original readme from espressif below.
 
