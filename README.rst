@@ -58,87 +58,61 @@ Expected result is something like:
 Setup project in VSCode
 =============
 
-Here are some useful vscode config files. Keep in mind to adjust the files according to your project paths.
+Check out the example folder for a ESP32 example using platformio and the arduino framework. It includes a launch.json and tasks.json file configured to build, assembly and flash the binary to the simulator as well as starting the simulator. Pressing the Start Debug Play button should do everything for you.
 
-*launch.json*
+This makes the whole code iteration process in around 10s from code change to running simulator by just clicking one button. Don't forget to checkout the runner.js in the qemu folder of the example. It interfaces the weird qemu terminal.
 
-.. code-block:: json
+*main.cpp*
 
-  {
-      // This launch file will allow you to start the QEMU simulation using the 
-      // Debugger UI elements of VSCode. It will take care of building the 
-      // solution, packing it into a binary and starting the simulator accordingly.
-      "version": "0.2.0",
-      "configurations": [
-          {
-              "name": "QEMU build",
-              "type": "node",
-              "request": "launch",
-              "program": "${workspaceFolder}/qemu/runner.js",
-              "args": [
-                  "esp32",
-                  "firmware.bin",
-                  "${workspaceFolder}"
-              ],
-              "preLaunchTask": "QEMU build binary",
-              "console": "integratedTerminal",
-              "internalConsoleOptions": "openOnSessionStart"
-          }
-      ]
-  }
+.. code-block:: cpp
 
-*tasks.json*
-
-.. code-block:: json
+  #include <Arduino.h>
+  #include <iostream>
   
+  void setup()
   {
-      "version": "2.0.0",
-      "tasks": [
-          {
-              "label": "QEMU build binary",
-              "type": "shell",
-              "command": "esptool.py",
-              "args": [
-                  "--chip",
-                  "esp32",
-                  "merge_bin",
-                  "--flash_mode",
-                  "dio",
-                  "--flash_size",
-                  "4MB",
-                  "--fill-flash-size",
-                  "4MB",
-                  "--output",
-                  "${workspaceFolder}/qemu/bin/firmware.bin",
-                  "0x1000",
-                  "${workspaceFolder}/.pio/build/test_esp32/bootloader.bin",
-                  "0x8000",
-                  "${workspaceFolder}/.pio/build/test_esp32/partitions.bin",
-                  "0x10000",
-                  "${workspaceFolder}/.pio/build/test_esp32/firmware.bin"
-              ],
-              "group": {
-                  "kind": "build",
-                  "isDefault": false
-              },
-              "dependsOn": "PlatformIO: Build",
-              "problemMatcher": []
-          },
-          {
-              "label": "PlatformIO: Build",
-              "type": "shell",
-              "command": "pio",
-              "args": [
-                  "run"
-              ],
-              "group": {
-                  "kind": "build",
-                  "isDefault": false
-              },
-              "problemMatcher": []
-          }
-      ]
+    std::cout << millis() << ": Look mom, I can count..." << std::endl;
   }
+  
+  int count = 0;
+  void loop()
+  {
+    long now = millis();
+    long next = now + 1000;
+    std::cout << now << ": " << ++count << std::endl;
+    while(next > millis()){
+      // do nothing
+    }
+  }
+
+*output.txt*
+
+.. code-block:: shell
+
+  QEMU for ESP32 started!
+  
+  ==67589==WARNING: ASan is ignoring requested __asan_handle_no_return: stack type: default top: 0x00016fcb0000; bottom 0x000106b84000; size: 0x00006912c000 (1762836480)
+  False positive error reports may follow
+  For details see https://github.com/google/sanitizers/issues/189
+  Adding SPI flash device
+  ets Jul 29 2019 12:21:46
+  
+  rst:0x1 (POWERON_RESET),boot:0x12 (SPI_FAST_FLASH_BOOT)
+  configsip: 0, SPIWP:0xee
+  clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+  mode:DIO, clock div:1
+  load:0x3fff0030,len:1184
+  load:0x40078000,len:13260
+  load:0x40080400,len:3028
+  entry 0x400805e4
+  2103: Look mom, I can count...
+  2136: 1
+  3136: 2
+  4136: 3
+  5136: 4
+  ...
+  ^C
+  QEMU stopped!
 
 
 Old original readme from espressif below.
