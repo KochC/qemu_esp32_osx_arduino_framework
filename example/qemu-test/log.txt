@@ -1,0 +1,55 @@
+➡️ Bulding for environment test_esp32s3 and esp32s3
+pio run -e test_esp32s3
+Processing test_esp32s3 (platform: espressif32; framework: arduino; board: um_tinys3)
+--------------------------------------------------------------------------------
+Verbose mode can be enabled via `-v, --verbose` option
+CONFIGURATION: https://docs.platformio.org/page/boards/espressif32/um_tinys3.html
+PLATFORM: Espressif 32 (6.5.0) > Unexpected Maker TinyS3
+HARDWARE: ESP32S3 240MHz, 320KB RAM, 8MB Flash
+DEBUG: Current (cmsis-dap) External (cmsis-dap, esp-bridge, esp-builtin, esp-prog, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa)
+PACKAGES: 
+ - framework-arduinoespressif32 @ 3.20014.231204 (2.0.14) 
+ - tool-esptoolpy @ 1.40501.0 (4.5.1) 
+ - toolchain-riscv32-esp @ 8.4.0+2021r2-patch5 
+ - toolchain-xtensa-esp32s3 @ 8.4.0+2021r2-patch5
+LDF: Library Dependency Finder -> https://bit.ly/configure-pio-ldf
+LDF Modes: Finder ~ chain, Compatibility ~ soft
+Found 33 compatible libraries
+Scanning dependencies...
+No dependencies
+Building in release mode
+Retrieving maximum program size .pio/build/test_esp32s3/firmware.elf
+Checking size .pio/build/test_esp32s3/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   9.3% (used 30624 bytes from 327680 bytes)
+Flash: [=         ]   8.4% (used 279177 bytes from 3342336 bytes)
+========================= [SUCCESS] Took 1.80 seconds =========================
+
+Environment    Status    Duration
+-------------  --------  ------------
+test_esp32s3   SUCCESS   00:00:01.805
+========================= 1 succeeded in 00:00:01.805 =========================
+esptool.py --chip esp32s3 \
+	merge_bin \
+	--flash_mode dio \
+	--flash_size 4MB \
+	--fill-flash-size 4MB \
+	--output flash.bin \
+	0x1000 .pio/build/test_esp32s3/bootloader.bin \
+	0x8000 .pio/build/test_esp32s3/partitions.bin \
+	0x10000 .pio/build/test_esp32s3/firmware.bin
+esptool.py v4.7.0
+Wrote 0x400000 bytes to file flash.bin, ready to flash to offset 0x0
+➡️ Starting simulation for environment test_esp32s3 and esp32s3
+qemu-system-xtensa \
+	-nographic \
+	-machine esp32s3 \
+	-global driver=esp32s3.gpio,property=strap_mode,value=0x08 \
+	-drive file=flash.bin,if=none,format=raw,id=efuse \
+	-global driver=timer.esp32.timg,property=wdt_disable,value=true
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+invalid header: 0x00000000
+invalid header: 0x00000000
+invalid header: 0x00000000
