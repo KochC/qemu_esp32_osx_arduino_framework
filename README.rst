@@ -1,4 +1,93 @@
 ===========
+QEMU for ESP32 & ESP32S3
+===========
+
+Compile on OSX
+=============
+
+In order to run ESP32 and ESP32S3 code in QEMU, we need an extended version of QEMU. This can be forked from espressif.
+
+⚠️ *Note:*
+You might need to install some dependencies first.
+
+
+**Configuring Build environment to compile QEMU:**
+
+
+.. code-block:: shell
+
+  ./configure \
+    --target-list=xtensa-softmmu,xtensaeb-softmmu \
+    --enable-gcrypt \
+    --enable-slirp \
+    --enable-sdl \
+    --enable-debug \
+    --enable-sanitizers \
+    --disable-strip \
+    --disable-user \
+    --disable-capstone \
+    --disable-vnc \
+    --disable-gtk \
+    --disable-gnutls
+
+**Building the QEMU:**
+
+.. code-block:: shell
+
+  ninja -C build
+
+Do not forget to add the `build` folder to your PATH.
+
+**Check QEMU:**
+
+After the solution is build, you can check if ESP32 and ESP32S3 emulators are available using the following command.
+
+.. code-block:: shell
+
+  qemu-system-xtensa -nographic -machine help
+
+Expected result is something like:
+
+.. code-block:: shell
+
+  Supported machines are:
+  esp32                Espressif ESP32 machine
+  esp32s3              Espressif ESP32S3 machine
+  ...
+
+Setup project
+=============
+
+A normal platformio project can be used to compile a binary to run in QEMU now. Because platformio in combination with a arduino framework does not provide a single binary file, you need to make sure to build it on your own. Use the following command to do so.Adjust paths and flash-size as needed.
+
+.. code-block:: shell
+
+  esptool.py --chip esp32 \
+    merge_bin \
+    --flash_mode dio \
+    --flash_size 4MB \
+    --fill-flash-size 4MB \
+    --output flash.bin \
+    0x1000 .pio/build/test/bootloader.bin \
+    0x8000 .pio/build/test/partitions.bin \
+    0x10000 .pio/build/test/firmware.bin
+
+
+Once you have build your binary file, you simply run it in the qemu simulator.
+
+.. code-block:: shell
+
+  qemu-system-xtensa \
+    -nographic \
+    -machine esp32 \
+    -drive file=flash.bin,if=mtd,format=raw \
+    -global driver=timer.esp32.timg,property=wdt_disable,value=true
+  
+
+
+Old original readme from espressif below.
+
+===========
 QEMU README
 ===========
 
