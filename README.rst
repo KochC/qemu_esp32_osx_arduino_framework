@@ -65,6 +65,9 @@ Here are some useful vscode config files. Keep in mind to adjust the files accor
 .. code-block:: json
 
   {
+      // This launch file will allow you to start the QEMU simulation using the 
+      // Debugger UI elements of VSCode. It will take care of building the 
+      // solution, packing it into a binary and starting the simulator accordingly.
       "version": "0.2.0",
       "configurations": [
           {
