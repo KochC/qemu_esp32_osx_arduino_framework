@@ -55,34 +55,87 @@ Expected result is something like:
   esp32s3              Espressif ESP32S3 machine
   ...
 
-Setup project
+Setup project in VSCode
 =============
 
-A normal platformio project can be used to compile a binary to run in QEMU now. Because platformio in combination with a arduino framework does not provide a single binary file, you need to make sure to build it on your own. Use the following command to do so.Adjust paths and flash-size as needed.
+Here are some useful vscode config files. Keep in mind to adjust the files according to your project paths.
 
-.. code-block:: shell
+*launch.json*
 
-  esptool.py --chip esp32 \
-    merge_bin \
-    --flash_mode dio \
-    --flash_size 4MB \
-    --fill-flash-size 4MB \
-    --output flash.bin \
-    0x1000 .pio/build/test/bootloader.bin \
-    0x8000 .pio/build/test/partitions.bin \
-    0x10000 .pio/build/test/firmware.bin
+.. code-block:: json
 
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "QEMU build",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/qemu/runner.js",
+            "args": [
+                "esp32",
+                "firmware.bin",
+                "${workspaceFolder}"
+            ],
+            "preLaunchTask": "QEMU build binary",
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "openOnSessionStart"
+        }
+    ]
+}
 
-Once you have build your binary file, you simply run it in the qemu simulator.
+*tasks.json*
 
-.. code-block:: shell
+.. code-block:: json
 
-  qemu-system-xtensa \
-    -nographic \
-    -machine esp32 \
-    -drive file=flash.bin,if=mtd,format=raw \
-    -global driver=timer.esp32.timg,property=wdt_disable,value=true
-  
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "QEMU build binary",
+            "type": "shell",
+            "command": "esptool.py",
+            "args": [
+                "--chip",
+                "esp32",
+                "merge_bin",
+                "--flash_mode",
+                "dio",
+                "--flash_size",
+                "4MB",
+                "--fill-flash-size",
+                "4MB",
+                "--output",
+                "${workspaceFolder}/qemu/bin/firmware.bin",
+                "0x1000",
+                "${workspaceFolder}/.pio/build/test_esp32/bootloader.bin",
+                "0x8000",
+                "${workspaceFolder}/.pio/build/test_esp32/partitions.bin",
+                "0x10000",
+                "${workspaceFolder}/.pio/build/test_esp32/firmware.bin"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "dependsOn": "PlatformIO: Build",
+            "problemMatcher": []
+        },
+        {
+            "label": "PlatformIO: Build",
+            "type": "shell",
+            "command": "pio",
+            "args": [
+                "run"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "problemMatcher": []
+        }
+    ]
+}
 
 
 Old original readme from espressif below.
